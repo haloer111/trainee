@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--该日志将日志级别不同的log信息保存到不同的文件中 -->
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+    <include resource="org/springframework/boot/logging/logback/file-appender.xml"/>
+
+    <springProperty scope="context" name="springAppName"
+                    source="spring.application.name" />
+
+    <!-- 日志在工程中的输出位置 -->
+    <property name="LOG_FILE" value="C:/data/logs/${springAppName}" />
+    <!--<property name="LOG_FILE" value="/data/ltz/logs/${springAppName}" />-->
+
+    <!-- 控制台的日志输出样式 -->
+    <property name="CONSOLE_LOG_PATTERN"
+              value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}) [ %thread ] [%X{requestId}] - %clr([ %-5level ]) [ %logger{50} : %line ] - %msg%n" />
+
+    <!-- 控制台输出 -->
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+        <!-- 日志输出编码 -->
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            <charset>utf8</charset>
+        </encoder>
+    </appender>
+
+    <!-- 文件输出 -->
+    <appender name="localfile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_FILE}.json</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_FILE}.json.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <maxFileSize>${LOG_FILE_MAX_SIZE:-1000MB}</maxFileSize>
+            <maxHistory>${LOG_FILE_MAX_HISTORY:-7}</maxHistory>
+        </rollingPolicy>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+        　　　　<encoder>
+        　　　　　　<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [url=%X{url};ltz-token=%X{ltz-token};executionTime=%X{executionTime};errcode=%X{errcode}]  %-5level %logger{35} - %msg%n</pattern>
+        　　　　</encoder>
+        　　</appender>
+    <!-- sql文件输出 -->
+    <appender name="sqlfile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_FILE}.sqllog</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            　　　　　　<fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.sqlLog</fileNamePattern>
+            　　　　　　<maxHistory>3</maxHistory>
+        </rollingPolicy>
+        　　　　<encoder>
+        　　　　　　<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{35} - %msg%n</pattern>
+        　　　　</encoder>
+        　　</appender>
+
+    <!-- 日志输出级别 -->
+    <root level="INFO">
+        <appender-ref ref="console" />
+<!--        <appender-ref ref="localfile"/>-->
+    </root>
+
+<!--    <logger name="dao" level="debug" additivity="false">-->
+<!--        <appender-ref ref="sqlfile" />-->
+<!--    </logger>-->
+</configuration>
